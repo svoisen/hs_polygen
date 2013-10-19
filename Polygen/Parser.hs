@@ -3,13 +3,14 @@ module Polygen.Parser (
 
 -------------------------------------------------------------------------------
 import           Control.Applicative
+import           Control.Monad (liftM)
 import           Data.Attoparsec.ByteString (Parser, takeWhile1, many1, skipMany)
 import qualified Data.Attoparsec.ByteString.Char8 as Char8 (char, takeWhile1, string)
 import           Data.Char (isAlphaNum)
 import           Data.Text (Text)
 import           Data.Text.Encoding (decodeUtf8)
 import           Polygen.Internal.Attoparsec (skipSpace, skipLine, isQuote, isEOL)
-import           Polygen.Types (ExpressionComponent(..), Expression, Rule(..))
+import           Polygen.Types (ExpressionComponent(..), Expression, Rule(..), Terminal(..), NonTerminal(..))
 
 -------------------------------------------------------------------------------
 --
@@ -33,14 +34,14 @@ parseExpression = do
 parseExpressionComponent :: Parser ExpressionComponent
 parseExpressionComponent = do
   skipSpace
-  component <- parseTerminal <|> parseNonTerminal
+  component <- liftM TerminalComponent parseTerminal <|> liftM NonTerminalComponent parseNonTerminal
   (skipSpace >> Char8.char '|' >> skipSpace) <|> return ()
   return (component)
 
 -------------------------------------------------------------------------------
 -- | Parse a non-terminal expression component, surrounded by <> such as
 -- | <start>
-parseNonTerminal :: Parser ExpressionComponent
+parseNonTerminal :: Parser NonTerminal
 parseNonTerminal = do
   name <- Char8.char '<' >> Char8.takeWhile1 isAlphaNum
   Char8.char '>'
@@ -49,7 +50,7 @@ parseNonTerminal = do
 -------------------------------------------------------------------------------
 -- | Parse a terminating expression component, surrounded by quotes such as
 -- | "foo"
-parseTerminal :: Parser ExpressionComponent
+parseTerminal :: Parser Terminal
 parseTerminal = do
   text <- Char8.char '"' >> takeWhile1 (not . isQuote)
   Char8.char '"'
