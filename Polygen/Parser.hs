@@ -1,4 +1,7 @@
+{-# LANGUAGE OverloadedStrings #-}
+
 module Polygen.Parser (
+  parseRule
 ) where
 
 -------------------------------------------------------------------------------

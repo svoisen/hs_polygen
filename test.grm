@@ -1,1 +1,1 @@
-<start> ::= "Hello" | "World"
+<start> ::= "Hello" | "World";
