@@ -1,28 +1,29 @@
 module Polygen.Types ( 
-  NonTerminal,
-  Terminal,
+  ExpressionComponent(..),
   Expression,
-  Rule,
-  Grammar,
-  nonTerminal,
+  Terminal,
+  NonTerminal,
+  Rule(..),
+  RuleName,
+  Grammar
 ) where
 
 -------------------------------------------------------------------------------
 import Data.Text (Text)
 
+newtype RuleName = RuleName Text deriving (Show)
+newtype Terminal = Terminal Text deriving (Show)
 newtype NonTerminal = NonTerminal Text deriving (Show)
-newtype Terminal    = Terminal Text deriving (Show)
 
-data Expression     = NonTerminatingExpression Terminal Expression
-                    | TerminatingExpression Terminal
-                    deriving (Show)
+data ExpressionComponent = TerminalComponent Terminal
+                         | NonTerminalComponent NonTerminal
+                         deriving (Show)
+
+type Expression = [ExpressionComponent]
 
 data Rule = Rule {
   name :: NonTerminal,
   expression :: Expression
-}
-
-nonTerminal :: Text -> NonTerminal
-nonTerminal = NonTerminal
+} deriving (Show)
 
 type Grammar = [Rule]

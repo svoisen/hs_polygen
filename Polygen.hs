@@ -9,3 +9,4 @@ main :: IO ()
 main = do
   (grammarFileName:_) <- getArgs
   file                <- readFile $ grammarFileName
+  hPutStrLn $ parseExpression 
